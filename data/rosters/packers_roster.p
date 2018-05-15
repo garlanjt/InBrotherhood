@@ -1,0 +1,10 @@
+(dp0
+S'team'
+p1
+c__builtin__
+set
+p2
+((lp3
+tp4
+Rp5
+s.
