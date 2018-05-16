@@ -227,7 +227,10 @@ def main():
         teams = db.Teams
 
         for team_to_insert in ["AtlantaFalcons","Patriots","Seahawks","Broncos","dallascowboys"]:
-            insert_team_tweets(team_to_insert, teams, twython_api, tweets_coll)
+            insert_team_tweets(team_to_insert=team_to_insert,
+                               teams= teams,
+                               twython_api=twython_api,
+                               weets_coll=tweets)
 
         #players =get_player_handles(roster_file)
         #for player in players:
