@@ -76,7 +76,7 @@ def collect_user_timeline(API,tweets_col,username):
         #    print("skipping...")
         #    print(tweet)
     #print("Done inserting "+username+" into DB.")
-    return processed_timeline,user_timeline
+    return processed_timeline
 
 
 
