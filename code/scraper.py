@@ -8,7 +8,7 @@ import pymongo
 from datetime import datetime
 
 #Global Flags#
-CACHE_JSON = False
+CACHE_JSON = True
 #####
 
 
@@ -47,27 +47,30 @@ def cache_tweet(to_cache,username):
 
         #################################################
 
-def collect_user_timeline(API,DB,username):
+def cache_tweets(to_cache_list,username):
+    for tweet in to_cache_list:
+        cache_tweet(tweet, username)
+
+def collect_user_timeline(API,tweets_col,username):
 
     user_timeline =getUserTweets(API, screen_name=username)
     #<todo>This is hacky to avoid double insertion, an upsert may be better here.
-    ids =get_screenname_ids(DB,username)
-
+    ids =get_screenname_ids(tweets_col,username)
+    processed_timeline = []
     for tweet in user_timeline:
 
         if tweet['id_str'] not in ids:
             #Parse the tweet
             tweet_dict = tweet_to_dict(tweet)
-            #Insert tweet into MongoDB
-            DB.insert_one(tweet_dict)
+            processed_timeline.append(tweet_dict)
             #Cache the tweet in case we fucked up
-            if CACHE_JSON:
-                cache_tweet(tweet,username)
-        else:
-            print("skipping...")
-            print(tweet)
-    print("Done inserting "+username+" into DB.")
-
+            #if CACHE_JSON:
+            #    cache_tweet(tweet,username)
+        #else:
+        #    print("skipping...")
+        #    print(tweet)
+    #print("Done inserting "+username+" into DB.")
+    return processed_timeline
 
 
 
@@ -147,52 +150,88 @@ def get_player_handles(roster):
         r_h = [x.strip() for x in content]
     return r_h
 
+def insert_player_tweets(twython_api, tweets_coll, player_handle):
+    # Go get the tweets we are missing.
+    processed_timeline = collect_user_timeline(twython_api, tweets_coll, player_handle)
+    if len(processed_timeline)>0:
+        tweets_coll.insert_many(processed_timeline)
+        #if x[""]
+    #else:
+    #outF.write(player_handle)
+    #outF.write("\n")
+
+    if CACHE_JSON:
+        print("starting to cache tweets")
+        cache_tweets(processed_timeline,player_handle)
+        print("finished caching tweets")
+#    cache_tweet(tweet,username)
+    #time.sleep(30)
+
+
+def insert_team_tweets(team_to_insert,teams,twython_api,tweets_coll):
+    #team_to_insert = "AtlantaFalcons"
+
+    #processedFile = "../logs/processed/" + team_to_insert + "CompletedPlayers.txt"
+    player_handles = teams.find_one({"_id": team_to_insert})["known_players"]
+
+    #if os._exists(processedFile):
+    #    with open(processedFile, "r") as f:
+    #        done = f.readlines().strip()
+    #else:
+    #    done = set([])
+    #print("Skipping ... ",done)
+    #players_to_process = set(player_handles) - set(done)
+
+    #outF = open(processedFile, "a")
+
+    for player_handle in player_handles:
+        if tweets_coll.find({"screen_name": player_handle}).count() == 0:
+
+            print("Starting ",player_handle)
+            insert_player_tweets(twython_api, tweets_coll, player_handle)
+            print("Going to sleep")
+            time.sleep(15)
+        else:
+            print("Skipping player",player_handle)
+
 def main():
-    #roster_file = "../data/falcons_handles.csv"
-    keyFile = open('api_key.keys', 'r')
-    consumer_key = keyFile.readline().strip()
-    consumer_secret = keyFile.readline().strip()
-    OAUTH_TOKEN = keyFile.readline().strip()
-    OAUTH_TOKEN_SECRET = keyFile.readline().strip()
-    keyFile.close()
+        #roster_file = "../data/falcons_handles.csv"
+        keyFile = open('api_key.keys', 'r')
+        consumer_key = keyFile.readline().strip()
+        consumer_secret = keyFile.readline().strip()
+        OAUTH_TOKEN = keyFile.readline().strip()
+        OAUTH_TOKEN_SECRET = keyFile.readline().strip()
+        keyFile.close()
 
 
-    auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
-    auth.set_access_token(OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
-    api = tweepy.API(auth)
+        auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+        auth.set_access_token(OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
+        api = tweepy.API(auth)
 
-    twython_api = twy.Twython(consumer_key, consumer_secret, OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
+        twython_api = twy.Twython(consumer_key, consumer_secret, OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
 
-    try:
-        db_conn = pymongo.MongoClient()
-        print "DB Connected successfully!!!"
-    except pymongo.errors.ConnectionFailure, e:
-        print "Could not connect to MongoDB: %s" % e
+        try:
+            db_conn = pymongo.MongoClient()
+            print "DB Connected successfully!!!"
+        except pymongo.errors.ConnectionFailure, e:
+            print "Could not connect to MongoDB: %s" % e
 
-    db = db_conn.NFL
-    # Make/Connect to a collection of tweets
-    tweets = db.Tweets
-    #player="BenGarland63"
+        db = db_conn.NFL
+        # Make/Connect to a collection of tweets
+        tweets = db.Tweets
+        #player="BenGarland63"
 
-    #####This is for testing purposes and should be removed!!!!!!!
-    #tweets.delete_many({})
+        #####This is for testing purposes and should be removed!!!!!!!
+        #tweets.delete_many({})
 
-    teams = db.Teams
+        teams = db.Teams
 
-    team ="AtlantaFalcons"
+        for team_to_insert in ["AtlantaFalcons","Patriots","Seahawks","Broncos","dallascowboys"]:
+            insert_team_tweets(team_to_insert, teams, twython_api, tweets_coll)
 
-    #
-    player_handles = teams.find_one({"_id": team})["known_players"]
-    for player in player_handles:
-        print("collecting tweets from ...."+player+" from "+team)
-        collect_user_timeline(twython_api, tweets, player)
-        print("Going to sleep...zzz")
-        time.sleep(30)
-
-
-    #players =get_player_handles(roster_file)
-    #for player in players:
-    #    collect_user_timeline(twython_api, tweets, player)
+        #players =get_player_handles(roster_file)
+        #for player in players:
+        #    collect_user_timeline(twython_api, tweets, player)
 
 
 
