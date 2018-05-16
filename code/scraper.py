@@ -54,6 +54,10 @@ def cache_tweets(to_cache_list,username):
 def collect_user_timeline(API,tweets_col,username):
 
     user_timeline =getUserTweets(API, screen_name=username)
+    if CACHE_JSON:
+        print("starting to cache tweets",username)
+        cache_tweets(user_timeline,username)
+        print("finished caching tweets",username)
     #<todo>This is hacky to avoid double insertion, an upsert may be better here.
     ids =get_screenname_ids(tweets_col,username)
     processed_timeline = []
@@ -61,8 +65,10 @@ def collect_user_timeline(API,tweets_col,username):
 
         if tweet['id_str'] not in ids:
             #Parse the tweet
+
             tweet_dict = tweet_to_dict(tweet)
             processed_timeline.append(tweet_dict)
+
             #Cache the tweet in case we fucked up
             #if CACHE_JSON:
             #    cache_tweet(tweet,username)
@@ -70,7 +76,7 @@ def collect_user_timeline(API,tweets_col,username):
         #    print("skipping...")
         #    print(tweet)
     #print("Done inserting "+username+" into DB.")
-    return processed_timeline
+    return processed_timeline,user_timeline
 
 
 
@@ -155,17 +161,7 @@ def insert_player_tweets(twython_api, tweets_coll, player_handle):
     processed_timeline = collect_user_timeline(twython_api, tweets_coll, player_handle)
     if len(processed_timeline)>0:
         tweets_coll.insert_many(processed_timeline)
-        #if x[""]
-    #else:
-    #outF.write(player_handle)
-    #outF.write("\n")
 
-    if CACHE_JSON:
-        print("starting to cache tweets")
-        cache_tweets(processed_timeline,player_handle)
-        print("finished caching tweets")
-#    cache_tweet(tweet,username)
-    #time.sleep(30)
 
 
 def insert_team_tweets(team_to_insert,teams,twython_api,tweets_coll):
