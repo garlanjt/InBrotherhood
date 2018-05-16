@@ -230,7 +230,7 @@ def main():
             insert_team_tweets(team_to_insert=team_to_insert,
                                teams= teams,
                                twython_api=twython_api,
-                               weets_coll=tweets)
+                               tweets_coll=tweets)
 
         #players =get_player_handles(roster_file)
         #for player in players:
