@@ -1,3 +1,5 @@
 *.keys
 data/jsondump/*
 data/junk/*
+.DS_Store
+.idea/*
