@@ -1,14 +1,76 @@
 import twython as twy
 import tweepy
-import os
-import time
-import requests
-import json
 import pymongo
-from datetime import datetime
 import os
 import pickle
 from pprint import pprint
+import glob
+import pandas as pd
+from nameparser import HumanName
+from build_player_db import find_player_by_name
+
+
+def get_team_mascots():
+    team_file ="../data/mascots.p"
+    if os.path.isfile(team_file):
+        team_mascots= pickle.load(open(team_file, "rb"))
+        print("loaded the team_mascots!")
+    else:
+        print("Mascot Pickle is missing...")
+
+    return team_mascots
+
+
+def export_roster_to_csv():
+    roster_dir = "../data/rosters/"
+    missing_players = set([])
+    team_mascots = get_team_mascots()
+    with open("combined_rosters.csv","w") as f:
+        for team in ["arizona-cardinals", "atlanta-falcons", "baltimore-ravens", "buffalo-bills", "carolina-panthers",
+                     "chicago-bears", "cincinnati-bengals", "cleveland-browns", "dallas-cowboys", "denver-broncos",
+                     "detroit-lions", "green-bay-packers", "houston-texans", "indianapolis-colts", "jacksonville-jaguars",
+                     "kansas-city-chiefs", "los-angeles-chargers", "los-angeles-rams", "miami-dolphins",
+                     "minnesota-vikings", "new-england-patriots", "new-orleans-saints", "new-york-giants", "new-york-jets",
+                     "oakland-raiders", "philadelphia-eagles", "pittsburgh-steelers", "san-francisco-49ers",
+                     "seattle-seahawks", "tampa-bay-buccaneers", "tennessee-titans", "washington-redskins"]:
+            print("STARTING " + team + "***********************")
+            mascot = ""
+            for t in team_mascots:
+                if t.lower() in team:
+                    mascot = t
+                    print("Using " + mascot + " for the mascot")
+            if mascot == "":
+                print("unable to assign mascot for " + team)
+                1 / 0
+
+            for year in xrange(2014, 2018):
+                if team == "los-angeles-chargers" and year <= 2016:
+                    team = "san-diego-chargers"
+                elif team == "san-diego-chargers" and year > 2016:
+                    team = "los-angeles-chargers"
+
+                # Rams City Change
+                if team == "los-angeles-rams" and year <= 2015:
+
+                    team = "st-louis-rams"
+                elif team == "st-louis-rams" and year > 2015:
+                    team = "los-angeles-rams"
+
+                roster = pd.read_csv(roster_dir + str(team) + "_" + str(year) + ".csv")
+
+                for index, row in roster.iterrows():
+                    player_name = row['player']
+                    name = HumanName(player_name)
+                    fname = name.first
+                    if name.title in ["Duke", "Prince", "Marquis"]:
+                        fname = name.title
+                    lname = name.last
+                    f.write(str(year) + "," + mascot + "," + fname+" "+lname + "\n")
+
+                    # print("Searching for...",player_name)
+                    # player_found, player_info=find_player_by_name(player_collection, fname.lower(), lname.lower())
+                    # add_player_to_roster(team_collection=team_collection,mascot=mascot,year= str
+
 
 def get_team_handles(api):
     team_file ="../data/team_handles.pkl"
@@ -22,6 +84,9 @@ def get_team_handles(api):
             team_handles.append(member.screen_name)
         pickle.dump(set(team_handles), open(team_file, "wb"))
     return team_handles
+
+
+
 def get_team_maintained_lists(api):
     #The output of this is being saved in
     team_handles=get_team_handles(api)
@@ -44,89 +109,131 @@ def get_team_maintained_lists(api):
     return slugs
 
 
-def get_team_roster_from_slug(api,team):
-    #The output of this is being saved in
-    #team_handles=get_team_handles(api)
-    slugs =get_team_maintained_lists(api)
 
 
-    roster_file = "../data/rosters/"+team+"_roster.p"
-    if not os.path.isfile(roster_file):
-        roster = []
-        for slug in slugs[team]:
-            print(team+":"+slug)
-            for member in tweepy.Cursor(api.list_members, team,slug).items():
-                    roster.append(member.screen_name)
-        print("Dumping "+team)
-        pickle.dump({"team":set(roster)}, open(roster_file, "wb"))
+def add_player_to_roster(team_collection,mascot,year,player_info,player_found):
+    roster_key=year + "_roster"
+    team = team_collection.find_one({"_id": mascot, roster_key: {"$exists": True}})
+
+    #<todo> need to fix this
+    year + "_roster"
+    if player_found:
+        new_player = [player_info["name"],player_info["_id"]]
     else:
-        print("skipping "+team+" seems to be complete")
-
-
-
-def get_player_handles(api):
-    player_file ="../data/player_handles.pkl"
-    if os.path.isfile(player_file):
-        player_handles= pickle.load(open(player_file, "rb"))
-        print("loaded the team_handles!")
+        new_player = [player_info, ""]
+    update = False
+    if team == None:
+        print("Table did not exist")
+        d = {roster_key: [new_player]}
+        update = True
     else:
-        print("building player handles")
-        player_handles = []
-        for member in tweepy.Cursor(api.list_members, 'feve10', 'NFL-Players').items():
-            player_handles.append(member.screen_name)
-        pickle.dump(set(player_handles), open(player_file, "wb"))
-    return player_handles
+        roster = team[roster_key]
+        #<todo> if we want to do more adds later then we need a more sophisticated
+        #  check here to only check first coordinate of "new player"
+        if new_player not in roster:
+            roster.append(new_player)
+            print(roster)
+            d = {roster_key: roster}
+            update = True
+    if update:
+        team_collection.update_one({"_id": mascot}, {"$set": d})
+
+
+
+
+def add_players_to_team_collection_rosters(player_collection,team_collection):
+    roster_dir = "../data/rosters/"
+    missing_players = set([])
+    team_mascots = get_team_mascots()
+    #for team in ["arizona-cardinals","atlanta-falcons","baltimore-ravens","buffalo-bills", "carolina-panthers", "chicago-bears", "cincinnati-bengals", "cleveland-browns", "dallas-cowboys", "denver-broncos", "detroit-lions", "green-bay-packers", "houston-texans", "indianapolis-colts", "jacksonville-jaguars", "kansas-city-chiefs", "los-angeles-chargers", "los-angeles-rams", "miami-dolphins", "minnesota-vikings", "new-england-patriots", "new-orleans-saints", "new-york-giants", "new-york-jets", "oakland-raiders", "philadelphia-eagles", "pittsburgh-steelers", "san-francisco-49ers", "seattle-seahawks", "tampa-bay-buccaneers", "tennessee-titans", "washington-redskins"]:
+    for team in ["atlanta-falcons","denver-broncos","new-england-patriots"]:
+        print("STARTING "+team+"***********************")
+        mascot = ""
+        for t in team_mascots:
+            if t.lower() in team:
+                mascot = t
+                print("Using "+mascot+" for the mascot")
+        if mascot == "":
+            print("unable to assign mascot for "+ team)
+            1/0
+
+        for year in xrange(2014, 2018):
+            roster = pd.read_csv(roster_dir+str(team)+"_"+str(year)+".csv")
+
+            for index, row in roster.iterrows():
+                player_name = row['player']
+                name = HumanName(player_name)
+                fname = name.first
+                if name.title in ["Duke","Prince","Marquis"]:
+                    fname =name.title
+                lname= name.last
+                #print("Searching for...",player_name)
+                player_found, player_info=find_player_by_name(player_collection, fname.lower(), lname.lower())
+                add_player_to_roster(team_collection=team_collection,mascot=mascot,year= str(year),player_info=player_info,player_found=player_found)
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 def build_team_collection(db,api):
     team_collection = db.Teams
     #team_handle = "AtlantaFalcons"
     team_handles = get_team_handles(api)
-    for team_handle in team_handles:
-        if team_collection.find({'_id': team_handle}).count() == 0:
-            print("trying to extract team")
-            team = create_team_dict(team_handle)
-            team_collection.insert_one(team)
+    team_mascots = get_team_mascots()
+    for mascot in team_mascots:
+        print("STARTING *****"+mascot+"**********")
+        files = glob.glob("../data/rosters/*" + mascot.lower() + "*.csv")
+        for handle in team_handles:
+            if mascot.lower() in handle.lower():
+                if team_collection.find({'_id': mascot}).count() == 0:
+                    #rint("trying to extract team")
+                    team = create_team_dict(handle,mascot,files)
+                    pprint(team)
+                    team_collection.insert_one(team)
+                    #print(files)
+                else:
+                    print(mascot+" already in DB.")
+
+        print("Finished *****" + mascot + "**********")
 
 
-def build_player_collection(db,api):
-    player_collection = db.Players
-    teams = db.Teams
-    player_handles=get_player_handles(api)
-    for player_handle in player_handles:
-        if player_collection.find({"_id":player_handle}).count() == 0:
-            player = creat_player_dict(player_handle,teams)
-            player_collection.insert_one(player)
+def get_roster_from_footballDBCSV(roster_file):
+    roster = pd.read_csv(roster_file)
+    print(roster_file)
+    return roster['player']
 
 
-
-def creat_player_dict(player_handle,teams):
-    player ={}
-    player["_id"] = player_handle
-    affiliations =[]
-    for team in teams.find({}):
-        if player_handle in team["known_players"]:
-            affiliations.append(team["_id"])
-
-    player["affiliations"] = affiliations
-    return player
-
-def extract_player_set_from_pickle(team_handle):
-    roster_file = "../data/rosters/" + team_handle + "_roster.p"
-    players = pickle.load(open(roster_file, "rb"))
-    print(players)
-    return(players)
-
-def create_team_dict(team_handle):
+def create_team_dict(team_handle,mascot,files):
     team ={}
-    team["_id"] =team_handle
-    team["known_players"] = list(extract_player_set_from_pickle(team_handle)["team"])
+    team["handle"] =team_handle
+    team["_id"] = mascot
+
+    #for roster_file in files:
+    #    players=list(set(get_roster_from_footballDBCSV(roster_file)))
+    #    #print(players)
+    #    #year = roster_file[-8:-4]
+    #    #combined = []
+    #    #for player in players:
+    #    #    combined.append((player,''))
+    #
+    #    #team[year+"_roster"] =combined
     return team
 
 
 
 
+
+
 def main():
-    roster_file = "../data/falcons_handles.csv"
     keyFile = open('api_key.keys', 'r')
     consumer_key = keyFile.readline().strip()
     consumer_secret = keyFile.readline().strip()
@@ -148,7 +255,7 @@ def main():
 
     db = db_conn.NFL
     build_team_collection(db,api)
-    build_player_collection(db, api)
+    #build_player_collection(db, api)
     # Make/Connect to a collection of tweets
 
 # This website would probably be super helpful if we go deeper. Would need to build a scraper

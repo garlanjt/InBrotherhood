@@ -1,70 +1,34 @@
-import twython as twy
 import tweepy
-import os
-import time
-import requests
-import json
 import pymongo
-from datetime import datetime
 import os
 import pickle
-from pprint import pprint
-
-def get_team_handles(api):
-    team_file ="../data/team_handles.pkl"
-    if os.path.isfile(team_file):
-        team_handles= pickle.load(open(team_file, "rb"))
-        print("loaded the team_handles!")
-    else:
-        print("need to build from scrath")
-        team_handles = []
-        for member in tweepy.Cursor(api.list_members, 'NFL', 'nfl-teams').items():
-            team_handles.append(member.screen_name)
-        pickle.dump(set(team_handles), open(team_file, "wb"))
-    return team_handles
-def get_team_maintained_lists(api):
-    #The output of this is being saved in
-    team_handles=get_team_handles(api)
-    slug_file ="../data/team_maint_player_lists.pkl"
-    if os.path.isfile(slug_file):
-        slugs= pickle.load(open(slug_file, "rb"))
-        print("loaded the team slugs!")
-    else:
-        slugs ={}
-    for team in team_handles:
-        if team not in slugs.keys():
-            results = api.lists_all(team)
-            #print("***Team***"+team)
-            s_list=[]
-            for l in results:
-                s_list.append(l)
-                print(l.slug + " : " + l.description)
-                #time.sleep(90)
-            #slugs[team]=s_list
-    return slugs
-
-
-def get_team_roster_from_slug(api,team):
-    #The output of this is being saved in
-    #team_handles=get_team_handles(api)
-    slugs =get_team_maintained_lists(api)
-
-
-    roster_file = "../data/rosters/"+team+"_roster.p"
-    if not os.path.isfile(roster_file):
-        roster = []
-        for slug in slugs[team]:
-            print(team+":"+slug)
-            for member in tweepy.Cursor(api.list_members, team,slug).items():
-                    roster.append(member.screen_name)
-        print("Dumping "+team)
-        pickle.dump({"team":set(roster)}, open(roster_file, "wb"))
-    else:
-        print("skipping "+team+" seems to be complete")
+import pandas as pd
+from nameparser import HumanName
+from build_team_db import get_team_mascots
+# def get_team_maintained_lists(api):
+#     #The output of this is being saved in
+#     team_handles=get_team_handles(api)
+#     slug_file ="../data/team_maint_player_lists.pkl"
+#     if os.path.isfile(slug_file):
+#         slugs= pickle.load(open(slug_file, "rb"))
+#         print("loaded the team slugs!")
+#     else:
+#         slugs ={}
+#     for team in team_handles:
+#         if team not in slugs.keys():
+#             results = api.lists_all(team)
+#             #print("***Team***"+team)
+#             s_list=[]
+#             for l in results:
+#                 s_list.append(l)
+#                 print(l.slug + " : " + l.description)
+#                 #time.sleep(90)
+#             #slugs[team]=s_list
+#     return slugs
 
 
 
-def get_all_player_info(api):
+def get_player_info_from_twitter_list(api):
     player_file ="../data/player_info.pkl"
     if os.path.isfile(player_file):
         player_info= pickle.load(open(player_file, "rb"))
@@ -76,76 +40,185 @@ def get_all_player_info(api):
         pickle.dump(set(player_info), open(player_file, "wb"))
     return player_info
 
-def build_team_collection(db,api):
-    team_collection = db.Teams
-    #team_handle = "AtlantaFalcons"
-    team_handles = get_team_handles(api)
-    for team_handle in team_handles:
-        if team_collection.find({'_id': team_handle}).count() == 0:
-            print("trying to extract team")
-            team = create_team_dict(team_handle)
-            team_collection.insert_one(team)
 
+
+def update_player_name(player_collection,handle,name):
+    new_name = {"name": name}
+    player_collection.update_one({"handle": handle}, {"$set": new_name})
+    print(player_collection.find_one({"handle":handle}))
 
 def build_player_collection(db,api):
     player_collection = db.Players
-    teams = db.Teams
     player_info=get_all_player_info(api)
     for player in player_info:
-        if player_collection.find({"_id":player_handle}).count() == 0:
-            player = creat_player_dict(player_handle,teams)
-            player_collection.insert_one(player)
+        if player_collection.find({"_id":player._json["id_str"]}).count() == 0:
+            player_dict = creat_player_dict(player._json)
+            print(player_dict)
+            player_collection.insert_one(player_dict)
+            print("inserted",player_dict)
 
 
-def creat_player_dict(player_handle):
-    player ={}
-    player["_id"] = player_handle
-    affiliations =[]
-    for team in teams.find({}):
-        if player_handle in team["known_players"]:
-            affiliations.append(team["_id"])
 
-    player["affiliations"] = affiliations
-    return player
+def add_player_by_username(db,api,handle):
+    player_collection = db.Players
+    if player_collection.find({"handle":handle}).count() == 0:
+        player = api.get_user(handle)
+        player_dict = creat_player_dict(player._json)
+        print(player_dict)
+        player_collection.insert_one(player_dict)
+        print("inserted",player_dict)
+    else:
+        print("User already in DB")
 
 
-def creat_player_dict(pl_info):
+def find_player_by_name(player_collection,first_name,last_name):
+    suffix_reg_ex = '(,?\ (?:[JS]r\.?|III?|IV))?$'
+    player_found = False
+    player_info = first_name.capitalize() + " " + last_name.capitalize()
+    player = player_collection.find({"name":{"$regex":r'^'+first_name+'.*'+last_name+suffix_reg_ex,"$options":"i"}})
+    if player.count() ==0:
+        #print("Player not found in DB: "+first_name+" "+ last_name)
+
+        players = player_collection.find({"name": {"$regex": r'^' +  '.*' + last_name + suffix_reg_ex, "$options": "i"}})
+        #player_info = first_name.capitalize() + " " + last_name.capitalize()
+        # if players.count() >0:
+        #     #print("##########Possibilities....#########")
+        #     #for p in players:
+        #     #    print(p)
+        #     #    print("update_player_name(player_collection,'"+p['handle']+"','"+player_info+"')")
+        #     #print("####################################")
+        #
+        # else:
+        #     print("No matches by last name either for ..." +player_info )
+    elif player.count() ==1:
+        player_found = True
+        player_info = player_collection.find_one({"name":{"$regex":r'^'+first_name+'.*'+last_name+suffix_reg_ex,"$options":"i"}})
+    elif player.count()>1:
+
+        print("MULTIPLE PLAYERS FOUND FOR "+player_info+"****************************************")
+        for x in player:
+            print(x)
+    return player_found,player_info
+
+
+
+# def map_players_to_handles(player_collection):
+#     roster_dir = "../data/rosters/"
+#
+#     #for team in ["arizona-cardinals","atlanta-falcons","baltimore-ravens","buffalo-bills", "carolina-panthers", "chicago-bears", "cincinnati-bengals", "cleveland-browns", "dallas-cowboys", "denver-broncos", "detroit-lions", "green-bay-packers", "houston-texans", "indianapolis-colts", "jacksonville-jaguars", "kansas-city-chiefs", "los-angeles-chargers", "los-angeles-rams", "miami-dolphins", "minnesota-vikings", "new-england-patriots", "new-orleans-saints", "new-york-giants", "new-york-jets", "oakland-raiders", "philadelphia-eagles", "pittsburgh-steelers", "san-francisco-49ers", "seattle-seahawks", "tampa-bay-buccaneers", "tennessee-titans", "washington-redskins"]:
+#     for team in [ "atlanta-falcons"]:
+#         #for year in xrange(2014, 2018):
+#         for year in [2017]:
+#             roster = pd.read_csv(roster_dir+str(team)+"_"+str(year)+".csv")
+#
+#             for index, row in roster.iterrows():
+#                 print(row)
+#                 player_name = row['player']
+#                 fname= player_name.split()[0]
+#                 lname=player_name.split()[1]
+#                 player_found, player_info=find_player_by_name(player_collection, fname.lower(), lname.lower())
+
+
+
+
+
+
+def creat_player_dict(pl_info,):
     #Should be sending in player_info._json
     player = {}
     player["_id"] = pl_info['id_str']
     player["name"] = pl_info["name"]
     player["handle"] =pl_info["screen_name"]
     player["private"] =pl_info["protected"]
+
     return player
 
-#def creat_player_dict(player_handle):
-#    player ={}
-#    player["_id"] = player_handle
-#    affiliations =[]
-#    for team in teams.find({}):
-#        if player_handle in team["known_players"]:
-#            affiliations.append(team["_id"])
-#
-#    player["affiliations"] = affiliations
-#    return player
 
-def extract_player_set_from_pickle(team_handle):
-    roster_file = "../data/rosters/" + team_handle + "_roster.p"
-    players = pickle.load(open(roster_file, "rb"))
-    print(players)
-    return(players)
-
-def create_team_dict(team_handle):
-    team ={}
-    team["_id"] =team_handle
-    team["known_players"] = list(extract_player_set_from_pickle(team_handle)["team"])
-    return team
+def add_team_to_player(player_collection,handle,mascot,year):
+    player = player_collection.find_one({"handle": handle, "Teams": {"$exists": True}})
+    new_team = [mascot, year]
+    update = False
+    if player == None:
+        print("Table did not exist")
+        d = {"Teams": [new_team]}
+        update = True
+    else:
+        Teams = player['Teams']
+        if new_team not in Teams:
+            Teams.append(new_team)
+            print(Teams)
+            d = {"Teams": Teams}
+            update = True
+    if update:
+        player_collection.update_one({"handle": handle}, {"$set": d})
 
 
+
+
+
+
+
+
+
+def update_player_record(player_collection,roster_dict,player_info):
+    #print(roster_dict)
+    #print(player_info)
+    #print("*********")
+    player_collection.update_one({"handle": player_info['handle']}, {"$set": roster_dict})
+
+
+    #print(player_collection.find_one({"handle":player_info['handle']}))
+    print("updated ",player_info['name'])
+    #1/0
+
+def manual_update(player_collection,handle,pos,bday,college):
+    roster_dict = {"pos": pos, "birthday": bday, "college": college}
+    player_collection.update_one({"handle": handle}, {"$set": roster_dict})
+
+
+def merge_roster_info_w_player_collection(player_collection):
+    roster_dir = "../data/rosters/"
+    missing_players = set([])
+    team_mascots = get_team_mascots()
+    #for team in ["arizona-cardinals","atlanta-falcons","baltimore-ravens","buffalo-bills", "carolina-panthers", "chicago-bears", "cincinnati-bengals", "cleveland-browns", "dallas-cowboys", "denver-broncos", "detroit-lions", "green-bay-packers", "houston-texans", "indianapolis-colts", "jacksonville-jaguars", "kansas-city-chiefs", "los-angeles-chargers", "los-angeles-rams", "miami-dolphins", "minnesota-vikings", "new-england-patriots", "new-orleans-saints", "new-york-giants", "new-york-jets", "oakland-raiders", "philadelphia-eagles", "pittsburgh-steelers", "san-francisco-49ers", "seattle-seahawks", "tampa-bay-buccaneers", "tennessee-titans", "washington-redskins"]:
+    for team in ["atlanta-falcons","denver-broncos","new-england-patriots"]:
+        print("STARTING "+team+"***********************")
+        mascot = ""
+        for t in team_mascots:
+            if t.lower() in team:
+                mascot = t
+                print("Using "+mascot+" for the mascot")
+        if mascot == "":
+            print("unable to asign mascot for "+ team)
+            1/0
+
+        for year in xrange(2014, 2018):
+            roster = pd.read_csv(roster_dir+str(team)+"_"+str(year)+".csv")
+
+            for index, row in roster.iterrows():
+                #print(row)
+                player_name = row['player']
+                #fname= player_name.split()[0]
+                #lname=player_name.split()[1]
+                name = HumanName(player_name)
+                fname = name.first
+                if name.title in ["Duke","Prince","Marquis"]:
+                    fname =name.title
+                lname= name.last
+                #print("Searching for...",player_name)
+                player_found, player_info=find_player_by_name(player_collection, fname.lower(), lname.lower())
+                if player_found:
+                    d_row =row.to_dict()
+                    del d_row["player"]
+                    #print(team,year)
+                    update_player_record(player_collection, d_row, player_info)
+                    add_team_to_player(player_collection=player_collection, handle=player_info["handle"],mascot=mascot,year= str(year))
+                else:
+                    missing_players.add(player_info)
+        print(len(missing_players),missing_players)
 
 
 def main():
-    roster_file = "../data/falcons_handles.csv"
     keyFile = open('api_key.keys', 'r')
     consumer_key = keyFile.readline().strip()
     consumer_secret = keyFile.readline().strip()
@@ -157,7 +230,6 @@ def main():
     auth.set_access_token(OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
     api = tweepy.API(auth)
 
-    twython_api = twy.Twython(consumer_key, consumer_secret, OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
 
     try:
         db_conn = pymongo.MongoClient()
@@ -166,7 +238,6 @@ def main():
         print "Could not connect to MongoDB: %s" % e
 
     db = db_conn.NFL
-    build_team_collection(db,api)
     build_player_collection(db, api)
     # Make/Connect to a collection of tweets
 
@@ -178,7 +249,7 @@ def main():
 
 
 
-main()
+#main()
 
     #This is saved in data/team_maint_player_lists.pkl
     # list_slugs = {'49ers': ['players', 'alumni'],
