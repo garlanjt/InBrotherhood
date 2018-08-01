@@ -14,8 +14,8 @@ class NFLDatabaseAdapter(object):
         try:
             self.db_conn = pymongo.MongoClient()
             self.db = self.db_conn.NFL
-            print("DB Connected successfully!!!"_
-        except pymongo.errors.ConnectionFailure, e:
+            print("DB Connected successfully!!!")
+        except pymongo.errors.ConnectionFailure as e:
             print("Could not connect to MongoDB: %s" % e)
 
 
