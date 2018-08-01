@@ -14,9 +14,9 @@ class NFLDatabaseAdapter(object):
         try:
             self.db_conn = pymongo.MongoClient()
             self.db = self.db_conn.NFL
-            print "DB Connected successfully!!!"
+            print("DB Connected successfully!!!"_
         except pymongo.errors.ConnectionFailure, e:
-            print "Could not connect to MongoDB: %s" % e
+            print("Could not connect to MongoDB: %s" % e)
 
 
         #Give access to all the collections
@@ -132,7 +132,7 @@ class NFLDatabaseAdapter(object):
             pprint(query)
         cursor = self.tweets_coll.find(query)
         if verbose:
-            ("Found "+str(cursor.count())+" tweets for this query.")
+            print("Found "+str(cursor.count())+" tweets for this query.")
         return cursor
 
 
