@@ -7,6 +7,7 @@ import json
 import pymongo
 from datetime import datetime
 from dbHandler import getRosterTwitterIds
+
 #Global Flags#
 CACHE_JSON = False
 #####
@@ -125,55 +126,55 @@ def tweet_to_dict(tweet):
 
 
 
-# Below function will get tweets based on screen_name or ID of user.  If both are given, will use ID.
-def getUserTweets(twython_conn,screen_name=None, id_number=None):
-    tweets = []
-    done = False
-    first_call = True
-    try:  # This try-except will catch Twython errors
-        if screen_name is not None:
-            #<todo> this skips most recent tweet
-
-            maxID = twython_conn.get_user_timeline(screen_name=[screen_name], count=1)[0]['id']  # Current max ID is ID of newest tweet
-
-            while not done:
-                temp = twython_conn.get_user_timeline(screen_name=[screen_name], tweet_mode = "extended", count=200, max_id=maxID - 1)  # Subtract 1 so that you do not loop through the last tweet, constantly downloading it until i equals 15.
-                if temp == []:
-                    #i =16 #This ensures you only request <3200 tweets
-                    print("All tweets for "+ screen_name +" collected.")
-                    done = True
-                else:
-                    #i +=1
-                    maxID = temp[len(temp) - 1]['id']
-                    tweets.extend(temp)
-                    time.sleep(1)
-
-        if id_number is not None:
-            #maxID = twython_conn.get_user_timeline(user_id=[id_number], count=1)[0]['id']  # Current max ID is ID of newest tweet
-            #for i in range(0, 16):  # Cannot return more than 3200 tweets; 200 at a time equals 16 cycles
-            while not done:
-                if first_call:
-                    temp = twython_conn.get_user_timeline(user_id=[id_number], count=200, tweet_mode = "extended")  # Subtract 1 so that you do not loop through the last tweet, constantly downloading it until i equals 15.
-                    first_call=False
-                else:
-                    temp = twython_conn.get_user_timeline(user_id=[id_number], count=200, tweet_mode = "extended", max_id=maxID - 1)  # Subtract 1 so that you do not loop through the last tweet, constantly downloading it until i equals 15.
-
-                if temp == []:
-                    done = True
-                    print("All tweets for " + id_number + " collected.")
-                else:
-                    #i += 1
-                    maxID = temp[- 1]['id']
-                    tweets.extend(temp)
-                    time.sleep(1)
-
-
-    except (twy.TwythonError, twy.TwythonAuthError, twy.TwythonRateLimitError) as e:
-        print(e)
-
-
-    return tweets
-
+# def getUserTweets(twython_conn,screen_name=None, id_number=None):
+#     """
+#
+#     :param twython_conn: A connection to the twython API
+#     :param screen_name: The users screen name/twitter handle you wish to update
+#     :param id_number: The users twitter id you wish to update
+#     :return: A list of tweets.
+#     """
+#
+#     tweets = []
+#     done = False
+#     first_call = True
+#     try:
+#         if screen_name is not None:
+#             #<todo> this skips most recent tweet
+#
+#             maxID = twython_conn.get_user_timeline(screen_name=[screen_name], count=1)[0]['id']  # Current max ID is ID of newest tweet
+#
+#             while not done:
+#                 temp = twython_conn.get_user_timeline(screen_name=[screen_name], tweet_mode = "extended", count=200, max_id=maxID - 1)  # Subtract 1 so that you do not loop through the last tweet, constantly downloading it until i equals 15.
+#                 if temp == []:
+#                     print("All tweets for "+ screen_name +" collected.")
+#                     done = True
+#                 else:
+#                     maxID = temp[len(temp) - 1]['id']
+#                     tweets.extend(temp)
+#                     time.sleep(1)
+#
+#         if id_number is not None:
+#             while not done:
+#                 if first_call:
+#                     temp = twython_conn.get_user_timeline(user_id=[id_number], count=200, tweet_mode = "extended")  # Subtract 1 so that you do not loop through the last tweet, constantly downloading it until i equals 15.
+#                     first_call=False
+#                 else:
+#                     temp = twython_conn.get_user_timeline(user_id=[id_number], count=200, tweet_mode = "extended", max_id=maxID - 1)  # Subtract 1 so that you do not loop through the last tweet, constantly downloading it until i equals 15.
+#
+#                 if temp == []:
+#                     done = True
+#                     print("All tweets for " + id_number + " collected.")
+#                 else:
+#                     maxID = temp[- 1]['id']
+#                     tweets.extend(temp)
+#                     time.sleep(1)
+#     except (twy.TwythonError, twy.TwythonAuthError, twy.TwythonRateLimitError) as e:
+#         print(e)
+#
+#
+#     return tweets
+#
 
 
 
@@ -245,11 +246,11 @@ def main():
         keyFile.close()
 
 
-        auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
-        auth.set_access_token(OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
-        api = tweepy.API(auth)
+        #auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
+        #auth.set_access_token(OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
+        #api = tweepy.API(auth)
 
-        twython_api = twy.Twython(consumer_key, consumer_secret, OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
+        twython_conn = twy.Twython(consumer_key, consumer_secret, OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
 
         try:
             db_conn = pymongo.MongoClient()

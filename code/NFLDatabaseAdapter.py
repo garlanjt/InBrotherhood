@@ -4,6 +4,12 @@ import datetime as dt
 from pprint import pprint
 import pandas as pd
 from helper_functions import clean_up_text
+import twython as twy
+import time
+from operator import itemgetter
+from datetime import datetime
+from pymongo.errors import BulkWriteError
+
 
 class NFLDatabaseAdapter(object):
 
@@ -39,6 +45,16 @@ class NFLDatabaseAdapter(object):
             id = player[1]
             if not id == "":
                 ids.append(id)
+        return ids
+    def _getTeamTwitterIds(self,mascot):
+        rosters = self.team_coll.find_one({"_id": mascot})
+        ids = []
+        for key in rosters.keys():
+            if "roster" in key:
+                for player in rosters[key]:
+                    id = player[1]
+                    if not id == "":
+                        ids.append(id)
         return ids
 
     def export_tweet_cursor_to_csv(self,cursor,filename,no_id=False):
@@ -135,7 +151,160 @@ class NFLDatabaseAdapter(object):
             print("Found "+str(cursor.count())+" tweets for this query.")
         return cursor
 
+    def _get_most_recent_tweet(self,screen_name=None, id_number=None):
+        if screen_name==None and id_number==None:
+            print("ERROR: Must specify a user.")
+            return None
+
+        if id_number:
+            query = {"player_twitter_id": id_number}
+        else:
+            query = {"screen_name":screen_name}
+
+        return list(self.tweets_coll.find(query).sort([("created_at", 1)]))[-1]
+
+    def _tweet_to_dict(self,tweet):
+        # This function processes the raw JSON response, filters out unwanted fields and returns a dictionary
+        data = {}
+        # Can use 'id' which is an int64 or id_str which is identical but a string.
+        data['_id'] = tweet['id_str']
+        # UTC time when this Tweet was created
+        data['created_at'] = datetime.strptime(tweet['created_at'], '%a %b %d %H:%M:%S +0000 %Y')
+
+        data['screen_name'] = tweet['user']['screen_name']
+        data['player_twitter_id'] = tweet["user"]["id_str"]
+        data['player_name'] = tweet['user']['name']
+        data['user_loc'] = tweet['user']['location']
+        data['geo'] = tweet['geo']
+        # Indiciated the machine detected BCP 47 language identifier.
+        data['language'] = tweet['lang']
+        # Full unparsed tweet text
+        data['full_text'] = tweet['full_text']
+        # Parsed out hashtags
+        data['hashtags'] = [hashtag['text'] for hashtag in tweet['entities']['hashtags']]
+        data['mentions'] = [mention['screen_name'] for mention in tweet['entities']['user_mentions']]
+        if "extended_entities" in tweet.keys():
+            data["media"] = tweet["extended_entities"]["media"]
+        elif "media" in tweet["entities"]:
+            data["media"] = tweet["entities"]["media"]
+        data['in_reply_to_screen_name'] = tweet['in_reply_to_screen_name']
+        return data
 
 
 
+    def _tweet_overlap_exists(self,most_recent_known_id,new_tweet_block):
+
+        temp = [self._tweet_to_dict(tweet) for tweet in new_tweet_block]
+        new_tweets_sorted = sorted(temp, key=itemgetter('created_at'), reverse=False)
+        last_known_tweet_time  = self.tweets_coll.find_one({"_id":most_recent_known_id})["created_at"]
+        last_new_tweet_time = new_tweets_sorted[-1]["created_at"]
+        print("known",last_known_tweet_time)
+        print("first",new_tweets_sorted[0]["created_at"])
+        print("last",last_new_tweet_time)
+        print("***************")
+        if last_known_tweet_time> last_new_tweet_time:
+            print("Already have these tweets..skipping.")
+            return 199,new_tweets_sorted
+        new_start_id = -1
+        for idx, t in enumerate(new_tweets_sorted):
+            # print(idx,t["created_at"])
+            if most_recent_known_id == t["_id"]:
+                new_start_id = idx
+
+        return new_start_id,new_tweets_sorted
+
+
+
+    def _get_new_tweets(self,twython_conn,screen_name=None, id_number=None):
+        """
+        Gets the most recent (at most) 3200 tweets.
+        :param twython_conn: A connection to the twython API
+        :param screen_name: The users screen name/twitter handle you wish to update
+        :param id_number: The users twitter id you wish to update
+        :return: A list of tweets.
+        """
+        tweets = []
+        done = False
+        newUser = False
+        try:
+            if screen_name:
+                print("Starting "+screen_name)
+                if self.tweets_coll.find({"screen_name": screen_name}).count() == 0:
+                    print("This is a new screen_name ...")
+                    newUser = True
+                else:
+                    print("Tweets for this user found in DB.")
+            elif id_number:
+                print("Starting "+id_number)
+                if self.tweets_coll.find({"player_twitter_id": id_number}).count() == 0:
+                    print("This is a new ID ...")
+                    newUser = True
+                else:
+                    print("Tweets for this user found in DB.")
+
+            if screen_name is not None or id_number is not None:
+                maxID =None
+                while not done:
+                    if maxID==None:
+                        new_tweet_block = twython_conn.get_user_timeline(screen_name=screen_name,user_id=id_number, count=200, tweet_mode="extended")
+                    else:
+                        new_tweet_block = twython_conn.get_user_timeline(screen_name=screen_name,user_id=id_number, count=200, tweet_mode="extended", max_id=maxID-1)
+
+                    if not newUser:
+                        most_recent_known_id = self._get_most_recent_tweet(screen_name=screen_name, id_number=id_number)["_id"]
+
+                        idx,new_tweets_sorted = self._tweet_overlap_exists(most_recent_known_id=most_recent_known_id, new_tweet_block=new_tweet_block)
+                        if not idx == -1:
+                            temp = new_tweets_sorted[idx + 1:]
+                            print("Found ",len(temp))
+                            done = True
+                        else:
+                            done = False
+                            temp = [self._tweet_to_dict(tweet) for tweet in new_tweet_block]
+                    else:
+                        temp = [self._tweet_to_dict(tweet) for tweet in new_tweet_block]
+                    if new_tweet_block == []:
+                        done = True
+                        print("Collected..."+str(len(tweets))+" tweets.")
+                    else:
+                        # i += 1
+                        maxID = new_tweet_block[- 1]['id']
+                        tweets.extend(temp)
+                        time.sleep(1)
+            else:
+                print("Must provide user info.")
+
+        except (twy.TwythonError, twy.TwythonAuthError, twy.TwythonRateLimitError) as e:
+            print(e)
+
+        return tweets
+    def updateUserTweets(self,twython_conn,screen_name=None, id_number=None):
+        new_tweets = self._get_new_tweets(twython_conn=twython_conn,screen_name=screen_name,id_number=id_number)
+        if len(new_tweets)>0:
+            #print("would insert ...", new_tweets[0], "and ", len(new_tweets), "more tweets")
+            try:
+                self.tweets_coll.insert_many(new_tweets)
+            except BulkWriteError as bwe:
+                print(bwe.details)
+                # you can also take this component and do more analysis
+                # werrors = bwe.details['writeErrors']
+                raise
+        else:
+            print("This user does not need to be updated.")
+
+
+    def updateTeam(self,mascot):
+        keyFile = open('api_key.keys', 'r')
+        consumer_key = keyFile.readline().strip()
+        consumer_secret = keyFile.readline().strip()
+        OAUTH_TOKEN = keyFile.readline().strip()
+        OAUTH_TOKEN_SECRET = keyFile.readline().strip()
+        keyFile.close()
+        twython_conn = twy.Twython(consumer_key, consumer_secret, OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
+
+        ids =self._getTeamTwitterIds(mascot)
+        print("Starting to update and insert..."+mascot)
+        for id in ids:
+            self.updateUserTweets(twython_conn=twython_conn,
+                                  id_number=id)
 
