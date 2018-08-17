@@ -106,6 +106,26 @@ class NFLDatabaseAdapter(object):
         else:
             return pd.DataFrame(list(cursor))
 
+
+    def getTweetsByTeam(self,mascot,verbose=False,ret_cursor=True):
+        ids = self._getTeamTwitterIds(mascot)
+        if verbose:
+            ("Found "+str(len(ids))+" players for the "+mascot+" in all years.")
+        pid_list = []
+        for pid in ids:
+            if verbose:
+                print(pid)
+            pid_list.append({"player_twitter_id":pid})
+        query_limiter={"$or":pid_list}
+        cursor=self.tweets_coll.find(query_limiter)
+        if ret_cursor:
+            return cursor
+        else:
+            return pd.DataFrame(list(cursor))
+
+
+
+
     def getTweetsByUser(self,screen_name=None,id=None,year=None,ret_cursor=True,verbose=False):
 
         if screen_name==None and id==None:
