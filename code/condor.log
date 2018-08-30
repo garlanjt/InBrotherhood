@@ -1,0 +1,366 @@
+000 (106583.000.000) 08/14 23:16:15 Job submitted from host: <192.168.100.50:9618?addrs=192.168.100.50-9618&noUDP&sock=3614359_3915_3>
+...
+001 (106583.000.000) 08/14 23:16:15 Job executing on host: <192.168.100.52:9618?addrs=192.168.100.52-9618&noUDP&sock=4536_e5ae_4>
+...
+007 (106583.000.000) 08/14 23:16:15 Shadow exception!
+	Error from slot1_1@patas-n2.ling.washington.edu: Failed to execute '/home2/haberc/tmp/Habes/NFL/InBrotherhood/code/run.sh': (errno=13: 'Permission denied')
+	0  -  Run Bytes Sent By Job
+	0  -  Run Bytes Received By Job
+...
+012 (106583.000.000) 08/14 23:16:15 Job was held.
+	Error from slot1_1@patas-n2.ling.washington.edu: Failed to execute '/home2/haberc/tmp/Habes/NFL/InBrotherhood/code/run.sh': (errno=13: 'Permission denied')
+	Code 6 Subcode 13
+...
+000 (106584.000.000) 08/14 23:17:09 Job submitted from host: <192.168.100.50:9618?addrs=192.168.100.50-9618&noUDP&sock=3614359_3915_3>
+...
+001 (106584.000.000) 08/14 23:17:09 Job executing on host: <192.168.100.52:9618?addrs=192.168.100.52-9618&noUDP&sock=4536_e5ae_4>
+...
+007 (106584.000.000) 08/14 23:17:09 Shadow exception!
+	Error from slot1_1@patas-n2.ling.washington.edu: Failed to execute '/home2/haberc/tmp/Habes/NFL/InBrotherhood/code/run.sh': (errno=13: 'Permission denied')
+	0  -  Run Bytes Sent By Job
+	0  -  Run Bytes Received By Job
+...
+012 (106584.000.000) 08/14 23:17:09 Job was held.
+	Error from slot1_1@patas-n2.ling.washington.edu: Failed to execute '/home2/haberc/tmp/Habes/NFL/InBrotherhood/code/run.sh': (errno=13: 'Permission denied')
+	Code 6 Subcode 13
+...
+000 (106585.000.000) 08/14 23:17:11 Job submitted from host: <192.168.100.50:9618?addrs=192.168.100.50-9618&noUDP&sock=3614359_3915_3>
+...
+000 (106586.000.000) 08/14 23:17:13 Job submitted from host: <192.168.100.50:9618?addrs=192.168.100.50-9618&noUDP&sock=3614359_3915_3>
+...
+000 (106587.000.000) 08/14 23:17:15 Job submitted from host: <192.168.100.50:9618?addrs=192.168.100.50-9618&noUDP&sock=3614359_3915_3>
+...
+001 (106585.000.000) 08/14 23:17:29 Job executing on host: <192.168.100.52:9618?addrs=192.168.100.52-9618&noUDP&sock=4536_e5ae_4>
+...
+007 (106585.000.000) 08/14 23:17:29 Shadow exception!
+	Error from slot1_1@patas-n2.ling.washington.edu: Failed to execute '/home2/haberc/tmp/Habes/NFL/InBrotherhood/code/run.sh': (errno=13: 'Permission denied')
+	0  -  Run Bytes Sent By Job
+	0  -  Run Bytes Received By Job
+...
+012 (106585.000.000) 08/14 23:17:29 Job was held.
+	Error from slot1_1@patas-n2.ling.washington.edu: Failed to execute '/home2/haberc/tmp/Habes/NFL/InBrotherhood/code/run.sh': (errno=13: 'Permission denied')
+	Code 6 Subcode 13
+...
+001 (106586.000.000) 08/14 23:17:29 Job executing on host: <192.168.100.69:9618?addrs=192.168.100.69-9618&noUDP&sock=1076_9ffe_4>
+...
+001 (106587.000.000) 08/14 23:17:30 Job executing on host: <192.168.100.60:9618?addrs=192.168.100.60-9618&noUDP&sock=1901_81a0_4>
+...
+007 (106586.000.000) 08/14 23:17:30 Shadow exception!
+	Error from slot1_2@patas-n19.ling.washington.edu: Failed to execute '/home2/haberc/tmp/Habes/NFL/InBrotherhood/code/run.sh': (errno=13: 'Permission denied')
+	0  -  Run Bytes Sent By Job
+	0  -  Run Bytes Received By Job
+...
+007 (106587.000.000) 08/14 23:17:30 Shadow exception!
+	Error from slot1_1@patas-gn1.ling.washington.edu: Failed to execute '/home2/haberc/tmp/Habes/NFL/InBrotherhood/code/run.sh': (errno=13: 'Permission denied')
+	0  -  Run Bytes Sent By Job
+	0  -  Run Bytes Received By Job
+...
+012 (106587.000.000) 08/14 23:17:30 Job was held.
+	Error from slot1_1@patas-gn1.ling.washington.edu: Failed to execute '/home2/haberc/tmp/Habes/NFL/InBrotherhood/code/run.sh': (errno=13: 'Permission denied')
+	Code 6 Subcode 13
+...
+012 (106586.000.000) 08/14 23:17:30 Job was held.
+	Error from slot1_2@patas-n19.ling.washington.edu: Failed to execute '/home2/haberc/tmp/Habes/NFL/InBrotherhood/code/run.sh': (errno=13: 'Permission denied')
+	Code 6 Subcode 13
+...
+009 (106583.000.000) 08/14 23:17:48 Job was aborted by the user.
+	via condor_rm (by user haberc)
+...
+009 (106584.000.000) 08/14 23:17:48 Job was aborted by the user.
+	via condor_rm (by user haberc)
+...
+009 (106585.000.000) 08/14 23:17:48 Job was aborted by the user.
+	via condor_rm (by user haberc)
+...
+009 (106586.000.000) 08/14 23:17:48 Job was aborted by the user.
+	via condor_rm (by user haberc)
+...
+009 (106587.000.000) 08/14 23:17:48 Job was aborted by the user.
+	via condor_rm (by user haberc)
+...
+000 (106588.000.000) 08/14 23:17:54 Job submitted from host: <192.168.100.50:9618?addrs=192.168.100.50-9618&noUDP&sock=3614359_3915_3>
+...
+001 (106588.000.000) 08/14 23:17:54 Job executing on host: <192.168.100.52:9618?addrs=192.168.100.52-9618&noUDP&sock=4536_e5ae_4>
+...
+007 (106588.000.000) 08/14 23:17:54 Shadow exception!
+	Error from slot1_1@patas-n2.ling.washington.edu: Failed to execute '/home2/haberc/tmp/Habes/NFL/InBrotherhood/code/run.sh': (errno=13: 'Permission denied')
+	0  -  Run Bytes Sent By Job
+	0  -  Run Bytes Received By Job
+...
+012 (106588.000.000) 08/14 23:17:54 Job was held.
+	Error from slot1_1@patas-n2.ling.washington.edu: Failed to execute '/home2/haberc/tmp/Habes/NFL/InBrotherhood/code/run.sh': (errno=13: 'Permission denied')
+	Code 6 Subcode 13
+...
+009 (106588.000.000) 08/14 23:19:04 Job was aborted by the user.
+	via condor_rm (by user haberc)
+...
+000 (106589.000.000) 08/14 23:19:26 Job submitted from host: <192.168.100.50:9618?addrs=192.168.100.50-9618&noUDP&sock=3614359_3915_3>
+...
+001 (106589.000.000) 08/14 23:19:44 Job executing on host: <192.168.100.52:9618?addrs=192.168.100.52-9618&noUDP&sock=4536_e5ae_4>
+...
+007 (106589.000.000) 08/14 23:19:44 Shadow exception!
+	Error from slot1_1@patas-n2.ling.washington.edu: Failed to execute '/home2/haberc/tmp/Habes/NFL/InBrotherhood/code/run.sh': (errno=13: 'Permission denied')
+	0  -  Run Bytes Sent By Job
+	0  -  Run Bytes Received By Job
+...
+012 (106589.000.000) 08/14 23:19:44 Job was held.
+	Error from slot1_1@patas-n2.ling.washington.edu: Failed to execute '/home2/haberc/tmp/Habes/NFL/InBrotherhood/code/run.sh': (errno=13: 'Permission denied')
+	Code 6 Subcode 13
+...
+009 (106589.000.000) 08/14 23:37:14 Job was aborted by the user.
+	via condor_rm (by user haberc)
+...
+000 (106590.000.000) 08/14 23:37:48 Job submitted from host: <192.168.100.50:9618?addrs=192.168.100.50-9618&noUDP&sock=3614359_3915_3>
+...
+001 (106590.000.000) 08/14 23:38:04 Job executing on host: <192.168.100.52:9618?addrs=192.168.100.52-9618&noUDP&sock=4536_e5ae_4>
+...
+007 (106590.000.000) 08/14 23:38:04 Shadow exception!
+	Error from slot1_1@patas-n2.ling.washington.edu: Failed to execute '/home2/haberc/tmp/Habes/NFL/InBrotherhood/code/run.sh': (errno=13: 'Permission denied')
+	0  -  Run Bytes Sent By Job
+	0  -  Run Bytes Received By Job
+...
+012 (106590.000.000) 08/14 23:38:04 Job was held.
+	Error from slot1_1@patas-n2.ling.washington.edu: Failed to execute '/home2/haberc/tmp/Habes/NFL/InBrotherhood/code/run.sh': (errno=13: 'Permission denied')
+	Code 6 Subcode 13
+...
+000 (106600.000.000) 08/15 12:52:31 Job submitted from host: <192.168.100.50:9618?addrs=192.168.100.50-9618&noUDP&sock=3614359_3915_3>
+...
+001 (106600.000.000) 08/15 12:52:31 Job executing on host: <192.168.100.52:9618?addrs=192.168.100.52-9618&noUDP&sock=4536_e5ae_4>
+...
+007 (106600.000.000) 08/15 12:52:31 Shadow exception!
+	Error from slot1_4@patas-n2.ling.washington.edu: Failed to execute '/home2/haberc/tmp/Habes/NFL/InBrotherhood/code/run.sh': (errno=13: 'Permission denied')
+	0  -  Run Bytes Sent By Job
+	0  -  Run Bytes Received By Job
+...
+012 (106600.000.000) 08/15 12:52:31 Job was held.
+	Error from slot1_4@patas-n2.ling.washington.edu: Failed to execute '/home2/haberc/tmp/Habes/NFL/InBrotherhood/code/run.sh': (errno=13: 'Permission denied')
+	Code 6 Subcode 13
+...
+009 (106590.000.000) 08/17 09:56:18 Job was aborted by the user.
+	via condor_rm (by user haberc)
+...
+009 (106600.000.000) 08/17 09:56:18 Job was aborted by the user.
+	via condor_rm (by user haberc)
+...
+000 (106640.000.000) 08/17 09:57:23 Job submitted from host: <192.168.100.50:9618?addrs=192.168.100.50-9618&noUDP&sock=3614359_3915_3>
+...
+001 (106640.000.000) 08/17 09:57:23 Job executing on host: <192.168.100.52:9618?addrs=192.168.100.52-9618&noUDP&sock=4536_e5ae_4>
+...
+006 (106640.000.000) 08/17 09:57:32 Image size of job updated: 71904
+	60  -  MemoryUsage of job (MB)
+	60820  -  ResidentSetSize of job (KB)
+...
+000 (106641.000.000) 08/17 09:58:34 Job submitted from host: <192.168.100.50:9618?addrs=192.168.100.50-9618&noUDP&sock=3614359_3915_3>
+...
+009 (106641.000.000) 08/17 09:58:39 Job was aborted by the user.
+	via condor_rm (by user haberc)
+...
+004 (106640.000.000) 08/17 09:58:39 Job was evicted.
+	(0) Job was not checkpointed.
+		Usr 0 00:01:11, Sys 0 00:00:00  -  Run Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Local Usage
+	0  -  Run Bytes Sent By Job
+	0  -  Run Bytes Received By Job
+	Partitionable Resources :    Usage  Request Allocated
+	   Cpus                 :                 1         1
+	   Disk (KB)            :        1        1    604438
+	   Memory (MB)          :       60    20480     20480
+...
+009 (106640.000.000) 08/17 09:58:39 Job was aborted by the user.
+	via condor_rm (by user haberc)
+...
+000 (106642.000.000) 08/17 09:59:17 Job submitted from host: <192.168.100.50:9618?addrs=192.168.100.50-9618&noUDP&sock=3614359_3915_3>
+...
+001 (106642.000.000) 08/17 09:59:33 Job executing on host: <192.168.100.60:9618?addrs=192.168.100.60-9618&noUDP&sock=1901_81a0_4>
+...
+006 (106642.000.000) 08/17 09:59:42 Image size of job updated: 72744
+	61  -  MemoryUsage of job (MB)
+	61584  -  ResidentSetSize of job (KB)
+...
+006 (106642.000.000) 08/17 10:00:31 Image size of job updated: 73040
+	61  -  MemoryUsage of job (MB)
+	61584  -  ResidentSetSize of job (KB)
+...
+005 (106642.000.000) 08/17 10:00:31 Job terminated.
+	(1) Normal termination (return value 0)
+		Usr 0 00:00:55, Sys 0 00:00:00  -  Run Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Local Usage
+		Usr 0 00:00:55, Sys 0 00:00:00  -  Total Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Total Local Usage
+	0  -  Run Bytes Sent By Job
+	0  -  Run Bytes Received By Job
+	0  -  Total Bytes Sent By Job
+	0  -  Total Bytes Received By Job
+	Partitionable Resources :    Usage  Request Allocated
+	   Cpus                 :                 1         1
+	   Disk (KB)            :        1        1   2294846
+	   Gpus                 :                           0
+	   Memory (MB)          :       61    61440     61440
+...
+000 (106643.000.000) 08/17 10:32:40 Job submitted from host: <192.168.100.50:9618?addrs=192.168.100.50-9618&noUDP&sock=3614359_3915_3>
+...
+001 (106643.000.000) 08/17 10:32:54 Job executing on host: <192.168.100.52:9618?addrs=192.168.100.52-9618&noUDP&sock=4536_e5ae_4>
+...
+006 (106643.000.000) 08/17 10:33:02 Image size of job updated: 254356
+	238  -  MemoryUsage of job (MB)
+	243080  -  ResidentSetSize of job (KB)
+...
+006 (106643.000.000) 08/17 10:33:11 Image size of job updated: 7726912
+	238  -  MemoryUsage of job (MB)
+	243080  -  ResidentSetSize of job (KB)
+...
+005 (106643.000.000) 08/17 10:33:11 Job terminated.
+	(1) Normal termination (return value 0)
+		Usr 0 00:01:56, Sys 0 00:00:04  -  Run Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Local Usage
+		Usr 0 00:01:56, Sys 0 00:00:04  -  Total Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Total Local Usage
+	0  -  Run Bytes Sent By Job
+	0  -  Run Bytes Received By Job
+	0  -  Total Bytes Sent By Job
+	0  -  Total Bytes Received By Job
+	Partitionable Resources :    Usage  Request Allocated
+	   Cpus                 :                 1         1
+	   Disk (KB)            :        1        1    604438
+	   Memory (MB)          :      238    61440     61440
+...
+000 (106644.000.000) 08/17 11:46:07 Job submitted from host: <192.168.100.50:9618?addrs=192.168.100.50-9618&noUDP&sock=3614359_3915_3>
+...
+001 (106644.000.000) 08/17 11:46:14 Job executing on host: <192.168.100.52:9618?addrs=192.168.100.52-9618&noUDP&sock=4536_e5ae_4>
+...
+006 (106644.000.000) 08/17 11:46:22 Image size of job updated: 236548
+	221  -  MemoryUsage of job (MB)
+	225336  -  ResidentSetSize of job (KB)
+...
+006 (106644.000.000) 08/17 11:48:17 Image size of job updated: 477828
+	221  -  MemoryUsage of job (MB)
+	225336  -  ResidentSetSize of job (KB)
+...
+005 (106644.000.000) 08/17 11:48:17 Job terminated.
+	(1) Normal termination (return value 0)
+		Usr 0 00:15:56, Sys 0 00:00:29  -  Run Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Local Usage
+		Usr 0 00:15:56, Sys 0 00:00:29  -  Total Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Total Local Usage
+	0  -  Run Bytes Sent By Job
+	0  -  Run Bytes Received By Job
+	0  -  Total Bytes Sent By Job
+	0  -  Total Bytes Received By Job
+	Partitionable Resources :    Usage  Request Allocated
+	   Cpus                 :                 1         1
+	   Disk (KB)            :        1        1    604438
+	   Memory (MB)          :      221    61440     61440
+...
+000 (106721.000.000) 08/20 00:04:57 Job submitted from host: <192.168.100.50:9618?addrs=192.168.100.50-9618&noUDP&sock=3614359_3915_3>
+...
+001 (106721.000.000) 08/20 00:05:17 Job executing on host: <192.168.100.52:9618?addrs=192.168.100.52-9618&noUDP&sock=4536_e5ae_4>
+...
+006 (106721.000.000) 08/20 00:05:26 Image size of job updated: 36780
+	31  -  MemoryUsage of job (MB)
+	30832  -  ResidentSetSize of job (KB)
+...
+006 (106721.000.000) 08/20 00:10:27 Image size of job updated: 563552
+	540  -  MemoryUsage of job (MB)
+	552272  -  ResidentSetSize of job (KB)
+...
+006 (106721.000.000) 08/20 00:15:28 Image size of job updated: 563552
+	541  -  MemoryUsage of job (MB)
+	553060  -  ResidentSetSize of job (KB)
+...
+006 (106721.000.000) 08/20 00:20:28 Image size of job updated: 587460
+	563  -  MemoryUsage of job (MB)
+	576180  -  ResidentSetSize of job (KB)
+...
+006 (106721.000.000) 08/20 00:25:28 Image size of job updated: 587460
+	564  -  MemoryUsage of job (MB)
+	576840  -  ResidentSetSize of job (KB)
+...
+005 (106721.000.000) 08/20 00:35:25 Job terminated.
+	(1) Normal termination (return value 0)
+		Usr 0 04:22:21, Sys 0 00:09:35  -  Run Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Local Usage
+		Usr 0 04:22:21, Sys 0 00:09:35  -  Total Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Total Local Usage
+	0  -  Run Bytes Sent By Job
+	0  -  Run Bytes Received By Job
+	0  -  Total Bytes Sent By Job
+	0  -  Total Bytes Received By Job
+	Partitionable Resources :    Usage  Request Allocated
+	   Cpus                 :                 1         1
+	   Disk (KB)            :        1        1    604438
+	   Memory (MB)          :      564    61440     61440
+...
+000 (106809.000.000) 08/21 22:06:21 Job submitted from host: <192.168.100.50:9618?addrs=192.168.100.50-9618&noUDP&sock=3614359_3915_3>
+...
+001 (106809.000.000) 08/21 22:06:21 Job executing on host: <192.168.100.52:9618?addrs=192.168.100.52-9618&noUDP&sock=4536_e5ae_4>
+...
+006 (106809.000.000) 08/21 22:06:31 Image size of job updated: 561100
+	538  -  MemoryUsage of job (MB)
+	549900  -  ResidentSetSize of job (KB)
+...
+006 (106809.000.000) 08/21 22:11:31 Image size of job updated: 561100
+	538  -  MemoryUsage of job (MB)
+	550720  -  ResidentSetSize of job (KB)
+...
+006 (106809.000.000) 08/21 22:16:31 Image size of job updated: 575244
+	551  -  MemoryUsage of job (MB)
+	563964  -  ResidentSetSize of job (KB)
+...
+006 (106809.000.000) 08/21 22:21:32 Image size of job updated: 586408
+	562  -  MemoryUsage of job (MB)
+	575128  -  ResidentSetSize of job (KB)
+...
+006 (106809.000.000) 08/21 22:26:33 Image size of job updated: 596760
+	572  -  MemoryUsage of job (MB)
+	585480  -  ResidentSetSize of job (KB)
+...
+005 (106809.000.000) 08/21 22:36:31 Job terminated.
+	(1) Normal termination (return value 0)
+		Usr 0 04:31:32, Sys 0 00:09:44  -  Run Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Local Usage
+		Usr 0 04:31:32, Sys 0 00:09:44  -  Total Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Total Local Usage
+	0  -  Run Bytes Sent By Job
+	0  -  Run Bytes Received By Job
+	0  -  Total Bytes Sent By Job
+	0  -  Total Bytes Received By Job
+	Partitionable Resources :    Usage  Request Allocated
+	   Cpus                 :                 1         1
+	   Disk (KB)            :        1        1    604438
+	   Memory (MB)          :      572    61440     61440
+...
+000 (106823.000.000) 08/21 23:28:39 Job submitted from host: <192.168.100.50:9618?addrs=192.168.100.50-9618&noUDP&sock=3614359_3915_3>
+...
+001 (106823.000.000) 08/21 23:28:42 Job executing on host: <192.168.100.51:9618?addrs=192.168.100.51-9618&noUDP&sock=1288_0a12_4>
+...
+006 (106823.000.000) 08/21 23:28:51 Image size of job updated: 303236
+	286  -  MemoryUsage of job (MB)
+	292036  -  ResidentSetSize of job (KB)
+...
+006 (106823.000.000) 08/21 23:33:52 Image size of job updated: 418532
+	398  -  MemoryUsage of job (MB)
+	407252  -  ResidentSetSize of job (KB)
+...
+006 (106823.000.000) 08/22 00:13:57 Image size of job updated: 421116
+	401  -  MemoryUsage of job (MB)
+	409836  -  ResidentSetSize of job (KB)
+...
+006 (106823.000.000) 08/22 00:33:18 Image size of job updated: 5392988
+	401  -  MemoryUsage of job (MB)
+	409836  -  ResidentSetSize of job (KB)
+...
+005 (106823.000.000) 08/22 00:33:18 Job terminated.
+	(1) Normal termination (return value 0)
+		Usr 0 07:09:55, Sys 0 00:17:24  -  Run Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Run Local Usage
+		Usr 0 07:09:55, Sys 0 00:17:24  -  Total Remote Usage
+		Usr 0 00:00:00, Sys 0 00:00:00  -  Total Local Usage
+	0  -  Run Bytes Sent By Job
+	0  -  Run Bytes Received By Job
+	0  -  Total Bytes Sent By Job
+	0  -  Total Bytes Received By Job
+	Partitionable Resources :    Usage  Request Allocated
+	   Cpus                 :                 1         1
+	   Disk (KB)            :        1        1   4704897
+	   Memory (MB)          :      401    61440     61440
+...

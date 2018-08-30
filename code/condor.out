@@ -1,0 +1,3 @@
+Running LDA with: {'num_topics': 10, 'passes': 300, 'alpha': 0.001}  
+
+lda saved in Broncos/model.lda 

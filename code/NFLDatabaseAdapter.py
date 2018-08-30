@@ -84,6 +84,7 @@ class NFLDatabaseAdapter(object):
 
     def getTweetsByRosterYear(self,mascot,year,limit_by_date=True,verbose=False,ret_cursor=True):
         ids = self._getRosterTwitterIds(mascot, year)
+
         if verbose:
             ("Found "+str(len(ids))+" players for the "+mascot+" roster year "+year)
         pid_list = []
